@@ -18,26 +18,29 @@ Registry::
 A registry is a web service to which Docker can connect to upload and download container images. The most well-known registry is Docker Hub, which is a public registry.
 
 Repository::
-* A registry is organized as a series of repositories. Each repository contains multiple Docker images that share a common name and generally the same purpose and functionality. These images normally have different versions identified with a tag.
-* When you download and run an image, you must specify the registry, repository, and version tag for the image. Tags are text labels, and you can use your version numbering system (v1.0, v1.1, v1.2, v2.0, and so on).
+A registry is organized as a series of repositories. Each repository contains multiple Docker images that share a common name and generally the same purpose and functionality. These images normally have different versions identified with a tag.
++
+When you download and run an image, you must specify the registry, repository, and version tag for the image. Tags are text labels, and you can use your version numbering system (v1.0, v1.1, v1.2, v2.0, and so on).
 
 Base image::
 The process of identifying a suitable base image usually starts with a search on Docker Hub for a ready-made image that **already contains an application framework** and all the utilities and tools of a Linux distribution like Ubuntu or Alpine.
 
 Dockerfile::
 A Dockerfile is a plain text file containing all the commands needed to build an image. Dockerfiles are written in a minimal scripting language designed for **building and configuring images**, and documents the operations required to build an image starting with a base image. By convention, applications meant to be packaged as Docker images typically have a Dockerfile located in the **root of their source code**.
-
++
 The `docker build` command creates a new image by running a Dockerfile. The `-f` flag indicates the name of the Dockerfile to use. The `-t` flag specifies the name of the image to be created. The final parameter, `.`, provides the build context for the source files for the _COPY_ command.
-
++
 The PORTS field indicates port 80 in the image was mapped to port 8080 on your computer.
 
 Azure Container Registry (ACR)::
 Azure Container Registry is a registry hosting service provided by Azure. Each Azure Container Registry resource you create is a separate registry with a unique URL. These registries are private: they require authentication to push or pull images.
 
 Azure Container Instance (ACI)::
-* Azure Container Instances is a great solution for any scenario that can operate in isolated containers, including simple applications, task automation, and build jobs.
-* Azure Container Instances also supports executing a command in a running container by providing an interactive shell to help with application development and troubleshooting. Access takes places over HTTPS, using TLS to secure client connections.
-* To retrieve and persist state with Azure Container Instances, we offer direct mounting of Azure Files shares backed by Azure Storage.
+Azure Container Instances is a great solution for any scenario that can operate in isolated containers, including simple applications, task automation, and build jobs.
++
+Azure Container Instances also supports executing a command in a running container by providing an interactive shell to help with application development and troubleshooting. Access takes places over HTTPS, using TLS to secure client connections.
++
+To retrieve and persist state with Azure Container Instances, we offer direct mounting of Azure Files shares backed by Azure Storage.
 
 Azure Kubernetes Service (AKS)::
 Azure Kubernetes Service simplifies deploying a managed Kubernetes cluster in Azure by offloading much of the complexity and operational overhead to Azure. As a hosted Kubernetes service, Azure handles critical tasks for you, like health monitoring and maintenance.
