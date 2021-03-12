@@ -5,6 +5,14 @@
 :toclevels: 3
 :sectnums:
 :sectnumlevels: 3
+# Github settings
+ifdef::env-github[]
+:note-caption: :pushpin:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+endif::[]
 
 <<<
 == Introduction
@@ -143,6 +151,14 @@ docker login [registry_name].azurecr.io \
   --password=[password]
 ----
 
+**Build an image according to the Dockerfile instructions and store it in the registry**
+[source, bash]
+----
+az acr build \
+  --registry [registry_name] \
+  --image [image_name] .
+----
+
 **Show tags of the specified repo as text**
 [source, bash]
 ----
@@ -163,6 +179,35 @@ az group delete \
 
 TIP: The **login-server URL** for a registry in Azure Container Registry has the form `[registry_name].azurecr.io`.
 
+=== Enable continuous integration
+. Define a task to automatically build an image from the source code and store it to the specified registry in the ACR
+[source, bash]
+----
+az acr task create \
+  --registry [registry_name] \
+  --name [task_name] \
+  --image [image_name] \
+  --context [repository_name] \
+  --branch master \
+  --file Dockerfile \
+  --username [username] \
+  --password [password]
+----
+
+. Configure CD and create a webhook
+    * go to _Container Settings_ in the _Azure portal_
+    * check _Continuous Deployment_ and save changes
+    * go to the _Webhooks_ page and check the webhook status
+
+. Deploy the app to use the webhook for automatic image rebuilds
+
+[source, bash]
+----
+az acr build \
+  --registry [registry_name] \
+  --image [image_name] .
+----
+
 === Create a replicated region for ACR
 . Replicate the specified registry to another region
 +
@@ -178,7 +223,7 @@ az acr replication create \
 [source, bash]
 ----
 az acr replication list \
-  --registry [registry_name]
+  --registry [registry_name] \
   --output table
 ----
 
@@ -347,7 +392,7 @@ az container attach \
   --name [instance_name]
 ----
 
-NOTE: The container details is shown as JSON, specifying e.g. the operating
+NOTE: The container details is shown as JSON, specifying e.g. the operating system, the image, resource requests, etc.
 
 <<<
 == AKS
@@ -452,26 +497,26 @@ The `docker build` command creates a new image by running a Dockerfile. The `-f`
 +
 The PORTS field indicates port 80 in the image was mapped to port 8080 on your computer.
 
-Azure Container Registry (ACR)::
-Azure Container Registry is a registry hosting service provided by Azure. Each Azure Container Registry resource you create is a separate registry with a unique URL. These registries are private: they require authentication to push or pull images.
-
-Azure Container Instance (ACI)::
-Azure Container Instances is a great solution for any scenario that can operate in isolated containers, including simple applications, task automation, and build jobs.
-+
-Azure Container Instances also supports executing a command in a running container by providing an interactive shell to help with application development and troubleshooting. Access takes places over HTTPS, using TLS to secure client connections.
-+
-To retrieve and persist state with Azure Container Instances, we offer direct mounting of Azure Files shares backed by Azure Storage.
-
-Azure Kubernetes Service (AKS)::
-Azure Kubernetes Service simplifies deploying a managed Kubernetes cluster in Azure by offloading much of the complexity and operational overhead to Azure. As a hosted Kubernetes service, Azure handles critical tasks for you, like health monitoring and maintenance.
-
 Resource Group::
 An Azure resource group is a logical container into which Azure resources are deployed and managed.
+
+Azure Container Registry (ACR)::
+Azure Container Registry is a registry hosting service provided by Azure. Each Azure Container Registry resource you create is a separate registry with a unique URL. These registries are private: they require authentication to push or pull images.
++
+Container Registry is organized around repositories that contain one or more images. All images stored in a container registry can be signed and are encrypted at rest. In addition to storing and hosting images, you can also use Container Registry to build images.
++
+Container Registry also lets you automate tasks such as redeploying an app when an image is rebuilt.
++
+The Premium SKU of Container Registry includes 500 GiB of storage.
++
+ACRs are highly scalable. They can be replicated to store images near where they're likely to be deployed.
 
 Azure Registry authentication::
 the recommended authentication method is Azure service principal. Access to a registry with an Azure Active Directory identity is role-based, and identities can be assigned one of three roles: **reader** (pull access only), **contributor** (push and pull access), or **owner** (pull, push, and assign roles to other users).
 +
-The **admin account** included with each registry. The admin account is disabled by default.
+The **admin account** is included with each registry; it is disabled by default.
++
+When the admin is enabled ( --admin-enabled true`), ACR enables the registry name as the username and the admin access key as the password.
 +
 TIP: Only use the registry admin account for early testing and exploration, and do not share the username and password. Disable the admin account and use only role-based access with Azure Active Directory identities to maximize the security of your registry.
 
@@ -485,9 +530,29 @@ A geo-replicated registry provides the following benefits:
 - No additional egress fees, as images are pulled from a local, replicated registry in the same region as your container host
 - Single management of a registry across multiple regions
 
+Webhooks::
+Azure App Service supports continuous deployment of a web app using webhooks. A webhook is a service offered by Azure Container Registry. Services and applications can subscribe to the webhook to receive notifications about updates to Docker images in the registry.
+
+Container Registry task::
+Tasks are configured to monitor registries and trigger rebuilds each time the source code changes automatically. If the build finishes successfully, Container Registry can store the image in the repository. If your web app is set up for continuous integration in App Service, it receives a notification via the webhook and updates the app.
+
+Azure Container Instance (ACI)::
+Azure Container Instances is a great solution for any scenario that can operate in isolated containers, including simple applications, task automation, and build jobs.
++
+Azure Container Instances also supports executing a command in a running container by providing an interactive shell to help with application development and troubleshooting. Access takes places over HTTPS, using TLS to secure client connections.
++
+To retrieve and persist state with Azure Container Instances, we offer direct mounting of Azure Files shares backed by Azure Storage.
+
+Azure Kubernetes Service (AKS)::
+Azure Kubernetes Service simplifies deploying a managed Kubernetes cluster in Azure by offloading much of the complexity and operational overhead to Azure. As a hosted Kubernetes service, Azure handles critical tasks for you, like health monitoring and maintenance.
+
 <<<
-== Resources
-- https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-azure-cli[Quickstart: Create a private container registry using the Azure CLI]
+== References
+=== MS modules
 - https://docs.microsoft.com/en-us/learn/modules/intro-to-containers/[Build a containerized web application with Docker]
 - https://docs.microsoft.com/en-us/learn/modules/build-and-store-container-images/[Build and store container images with Azure Container Registry]
+- https://docs.microsoft.com/en-us/learn/modules/deploy-run-container-app-service/[Deploy and run a containerized web app with Azure App Service]
+
+== MS Docs
+- https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-azure-cli[Quickstart: Create a private container registry using the Azure CLI]
 - https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough[Quickstart: Deploy an Azure Kubernetes Service cluster using the Azure CLI]
