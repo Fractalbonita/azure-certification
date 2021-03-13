@@ -396,9 +396,7 @@ NOTE: The container details is shown as JSON, specifying e.g. the operating syst
 
 <<<
 == AKS
-=== Integrate Azure containers with Kubernetes
-Deploy an ACI with Kubernetes as orchestrator
-
+=== Deploy an ACI with Kubernetes as orchestrator
 . `az group create --name [group_name] --location [location]` — create a resource group if necessary
 . `az aks create --resource-group [group_name] --name [cluster_name] --node-count 1 --enable-addons monitoring --generate-ssh-keys` — create an AKS cluster
 . `az acs kubernetes install-cli` — install the Kubernetes CLI tool to manage the Kubernetes cluster **kubectl**
@@ -408,6 +406,8 @@ Kubernetes cluster
 . `kubectl apply -f [kubernetes_yaml_file_name].yaml`— deploy the app and specify the name of your YAML manifest
 . `kubectl get service [service_name] --watch` — monitor the deployment process (stop the watch process when the EXTERNAL-IP address changes from pending to an actual public IP address)
 . `az group delete --name [group_name] --yes --no-wait` — delete the resource group and all resources it contains when the cluster is no longer needed
+
+NOTE: You can change any of the default AKS cluster properties after your cluster has been created.
 
 '''
 _Intro video_
@@ -420,10 +420,9 @@ _Intro video_
 . `kubectl create -f examples/aci-connector.yaml`— set up the ACI connector
 . create a Kubernetes manifest file
 
-*+Kubernetes manifest**
+**Example Kubernetes manifest file**
 [source, yaml, numbered]
 ----
-# Example Kubernetes Manifest File
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -441,9 +440,9 @@ spec:
         - name: ALLOW_EMPTY_PASSWORD
           value: "yes"
         - name: AZURE_CLIENT_ID
--         value: id
--       - name: AZURE_CLIENT_KEY
--         value: key
+         value: id
+        - name: AZURE_CLIENT_KEY
+         value: key
         - name: AZURE_TENANT_ID
           value: id
         - name: AZURE_SUBSCRIPTION_ID
@@ -544,15 +543,54 @@ Azure Container Instances also supports executing a command in a running contain
 To retrieve and persist state with Azure Container Instances, we offer direct mounting of Azure Files shares backed by Azure Storage.
 
 Azure Kubernetes Service (AKS)::
-Azure Kubernetes Service simplifies deploying a managed Kubernetes cluster in Azure by offloading much of the complexity and operational overhead to Azure. As a hosted Kubernetes service, Azure handles critical tasks for you, like health monitoring and maintenance.
+An AKS cluster is a cloud hosted Kubernetes cluster. Azure Kubernetes Service simplifies deploying a managed Kubernetes cluster in Azure by offloading much of the complexity and operational overhead to Azure.
++
+As a hosted Kubernetes service, Azure handles critical tasks for you, like health monitoring and maintenance. AKS environment is enabled with features such as automated updates, self-healing, and easy scaling.
++
+You can use Resource Manager templates to automate cluster creation. With these templates, you specify features such as advanced networking, Azure Active Directory (AD) integration, and monitoring.
++
+Configure basic information about the cluster:
++
+    - The Kubernetes cluster name
+    - The version of Kubernetes to install
+    - A DNS prefix to make the master node publicly accessible
+    - The initial node pool size
++
+[NOTE]
+====
+The Kubernetes cluster master node is managed by Azure and is free. You manage the agent nodes in the cluster and only pay for the node VMs, storage, and networking resources consumed in your cluster.
+
+The initial node pool size defaults to two nodes, however it's recommended that at least three nodes are used for a production environment.
+
+In production and cloud deployments, the preferred configuration is a high-availability deployment with three to five replicated control planes, instead of a single control plane.
+====
++
+AKS supports:
++
+    - Identity and security management.
+    - Integrated logging and monitoring.
+    - Auto cluster node and pod scaling.
+    - Cluster node upgrades.
+    - Static and dynamic storage volumes.
+    - GPU enabled nodes.
+    - Cluster deployment into an existing virtual network.
+    - Ingress with HTTP application routing.
+    - Docker file image format.
+    - Private container registry.
++
+AKS also supports all the popular development and management tools such as Helm, Draft, Kubernetes extension for Visual Studio Code and Visual Studio Kubernetes Tools.
++
+For information on the deployment center and DevOps Spaces go to https://docs.microsoft.com/en-us/learn/modules/intro-to-azure-kubernetes-service/[Introduction to Azure Kubernetes Service].
 
 <<<
 == References
 === MS modules
 - https://docs.microsoft.com/en-us/learn/modules/intro-to-containers/[Build a containerized web application with Docker]
 - https://docs.microsoft.com/en-us/learn/modules/build-and-store-container-images/[Build and store container images with Azure Container Registry]
-- https://docs.microsoft.com/en-us/learn/modules/deploy-run-container-app-service/[Deploy and run a containerized web app with Azure App Service]
 
-== MS Docs
+- https://docs.microsoft.com/en-us/learn/modules/deploy-run-container-app-service/[Deploy and run a containerized web app with Azure App Service]
+- https://docs.microsoft.com/en-us/learn/modules/intro-to-azure-kubernetes-service/[Introduction to Azure Kubernetes Service]
+
+=== MS Docs
 - https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-azure-cli[Quickstart: Create a private container registry using the Azure CLI]
 - https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough[Quickstart: Deploy an Azure Kubernetes Service cluster using the Azure CLI]
