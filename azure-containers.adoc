@@ -19,7 +19,7 @@ Docker was initially developed for Linux and has expanded to support Windows. In
 
 For example, Microsoft offers Windows and Linux Docker images containing an ASP.NET Core environment that can be used as the basis for containerized ASP.NET Core applications.
 
-Linux computers with Docker installed can only run Linux containers. Windows computers with Docker installed can run both kinds of containers. Windows accomplishes this by using a virtual machine to run a Linux system and uses the virtual Linux system to run Linux containers.
+A Linux computer with Docker installed can only run Linux containers. Windows computers with Docker installed can run both kinds of containers. Windows accomplishes this by using a virtual machine to run a Linux system and uses the virtual Linux system to run Linux containers.
 
 == Azure Container Registry (ACR)
 Azure Container Registry is a registry hosting service provided by Azure. Each Azure Container Registry resource you create is a separate registry with a unique URL. These registries are private: they require authentication to push or pull images.
@@ -48,7 +48,7 @@ The recommended authentication method is Azure service principal. Access to a re
 
 The **admin account** is included with each registry; it is disabled by default.
 
-When the admin is enabled ( --admin-enabled true`), ACR enables the registry name as the username and the admin access key as the password.
+When the admin is enabled ( --admin-enabled true`), ACR enables the registry name as the username, and the admin access key as the password.
 
 TIP: Only use the registry admin account for early testing and exploration, and do not share the username and password. Disable the admin account and use only role-based access with Azure Active Directory identities to maximize the security of your registry.
 
@@ -324,7 +324,7 @@ az container show \
 ====
 The instance will be **allocated a public IP address**. You access the instance with this IP address. You can **optionally specify a DNS name** if you prefer to reference the instance through a more user-friendly label.
 
-The default port is 80 and the port protocol is TCP.
+The default port is 80, and the port protocol is TCP.
 ====
 
 === Manage containers
@@ -528,23 +528,19 @@ spec:
   selector:
     matchLabels:
       app: azure-vote-back
-    containers:
+  template:
+    metadata:
+      labels:
+        app: azure-vote-back
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
       - name: azure-vote-back
         image: mcr.microsoft.com/oss/bitnami/redis:6.0.8
-        imagePullPolicy: Always
         env:
         - name: ALLOW_EMPTY_PASSWORD
           value: "yes"
-        - name: AZURE_CLIENT_ID
-         value: id
-        - name: AZURE_CLIENT_KEY
-         value: key
-        - name: AZURE_TENANT_ID
-          value: id
-        - name: AZURE_SUBSCRIPTION_ID
-          value: id
-        - name: AZURE_RESOURCE_GROUP
-          value: group
         resources:
           requests:
             cpu: 100m
