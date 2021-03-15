@@ -278,7 +278,7 @@ Azure Cosmos DB provides five APIs::
 === Core (SQL) API
 Core (SQL) is the default API for Azure Cosmos DB, which provides you with a view of your data that **resembles a traditional NoSQL document store**. You can query the hierarchical JSON documents with a SQL-like language. Core (SQL) uses JavaScript's type system, expression evaluation, and function invocation.
 
-=== Querying
+==== Querying
 .Core (SQL) provides several familiar SQL statements and clauses
     * SELECT
     * FROM
